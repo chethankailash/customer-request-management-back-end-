@@ -23,9 +23,23 @@ app.get('/',(req,res)=>{
 app.get('/about',(req,res)=>{
 	res.send({
 		notice:"about us page"
-	})
-})
+	});
+});
 
+app.get('/products/:id',(req,res)=>{
+	let id= req.params.id;
+	res.send({
+		notice:`you asked for products ${id}`
+	});
+});
+
+app.get('/users/:uid/orders/:oid',(req,res)=>{
+	let uid= req.params.uid;
+	let oid= req.params.oid;
+	res.send({
+		notice:`user:${uid}-order:${oid}`
+	});
+});
 
 app.listen(port,()=>{
 	console.log(`listening on port ${port}`);
