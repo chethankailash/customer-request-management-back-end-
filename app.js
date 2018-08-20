@@ -8,6 +8,8 @@ const mongoose = require('./config/db');
 
 const {Ticket}=require('./models/ticket');
 
+const Employee=require('./models/employee');
+
 const app=express();
 
 const port=3000;
@@ -64,6 +66,13 @@ app.get('/tickets',(req,res)=>{
 	})
 
 });
+// get all employee
+app.get('/employees',(req,res)=>{
+	Employee.find().then((employee)=>{
+		res.send(employee);
+	})
+
+});
 
 
 //create record
@@ -74,6 +83,21 @@ app.post('/tickets',(req,res)=>{
 		res.send({
 			ticket,
 			notice:"successfully created ticket"
+		});
+	})
+	.catch((err)=>{
+		res.send(err);
+	})
+
+});
+// creating record for employee
+app.post('/employees',(req,res)=>{
+	let body=req.body;
+	let employee= new Employee(body);
+	employee.save().then((employee)=>{
+		res.send({
+			employee,
+			notice:"successfully created employee"
 		});
 	})
 	.catch((err)=>{
@@ -103,6 +127,26 @@ app.get('/tickets/:id',(req,res)=>{
 	});
 });
 
+//find one employee
+app.get('/employees/:id',(req,res)=>{
+	id=req.params.id;
+	
+	if(!ObjectId.isValid(id)){
+		res.send({
+			notice:"invalid id"
+		})
+
+		return false;
+	}
+	Employee.findById(id)
+	.then((employee)=>{
+		res.send(employee);
+	})
+	.catch((err)=>{
+		res.send(err);
+	});
+});
+
 // delete
 app.delete('/tickets/:id',(req,res)=>{
 	let id = req.params.id;
@@ -116,6 +160,26 @@ app.delete('/tickets/:id',(req,res)=>{
 		{
 			res.status(404).send({
 				notice:"ticket not found"
+			})
+		}
+	})
+	.catch((err)=>{
+		res.send(err)
+	})
+})
+
+app.delete('/employees/:id',(req,res)=>{
+	let id = req.params.id;
+	Employee.findByIdAndRemove(id)
+	.then((employee)=>{
+		if(employee){
+		res.send({
+			employee,
+			notice:"employee successfully deleted"
+		})}else
+		{
+			res.status(404).send({
+				notice:"employee not found"
 			})
 		}
 	})
@@ -141,6 +205,29 @@ app.put('/tickets/:id',(req,res)=>{
 	.then((ticket)=>{
 		res.send({
 			ticket,
+			notice:"successfully updated"
+		});
+	})
+	.catch((err)=>{
+		res.send(err);
+	})
+})
+
+app.put('/employees/:id',(req,res)=>{
+	let id= req.params.id;
+	let body= req.body;
+
+	if(!ObjectId.isValid(id)){
+		res.send({
+			notice:"invalid id"
+		})
+		return false;
+	}
+
+	Employee.findByIdAndUpdate(id,{$set:body},{new:true})
+	.then((employee)=>{
+		res.send({
+			employee,
 			notice:"successfully updated"
 		});
 	})
