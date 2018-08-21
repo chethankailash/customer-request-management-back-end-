@@ -1,5 +1,5 @@
 const express = require('express');
-
+const _ = require('lodash');
 const bodyParser= require('body-parser');
 
 const {ObjectId} = require('mongodb');
@@ -17,7 +17,6 @@ const port=3000;
 
 //ROUTE HANDLER
 //app.method(path,Handler)
-
 //logger middleware
 
 
@@ -92,7 +91,8 @@ app.post('/tickets',(req,res)=>{
 });
 // creating record for employee
 app.post('/employees',(req,res)=>{
-	let body=req.body;
+	let body=_.pick(req.body,['department','priority','message']);
+
 	let employee= new Employee(body);
 	employee.save().then((employee)=>{
 		res.send({
@@ -215,7 +215,7 @@ app.put('/tickets/:id',(req,res)=>{
 
 app.put('/employees/:id',(req,res)=>{
 	let id= req.params.id;
-	let body= req.body;
+	let body=_.pick(req.body,['department','priority','message']);
 
 	if(!ObjectId.isValid(id)){
 		res.send({
